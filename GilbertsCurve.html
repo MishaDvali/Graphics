@@ -14,10 +14,10 @@
 	</svg>
 
 	<script>
+		const layer = 2;
 
-		const layer = 4;
-
-
+		let lastX = 10
+		let lastY = 10;
 
 
 
@@ -26,14 +26,24 @@
 		function toRadians(degrees) {
 			return degrees * (Math.PI / 180);
 		}
+		
+		color = 131313
+		function GetColor() {
+				color += 131313
+				if (color >= 800000) {
+						color = 131313 
+				}
 
+				return color
+
+		}
 		function createLine(x1, y1, x2, y2) {
 			const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
 			line.setAttribute("x1", x1);
 			line.setAttribute("y1", y1);
 			line.setAttribute("x2", x2);
 			line.setAttribute("y2", y2);
-			line.setAttribute("stroke", "black");
+			line.setAttribute("stroke", "#" + GetColor());
 			line.setAttribute("stroke-width", "2");
 
 			svg.appendChild(line);
@@ -47,33 +57,59 @@
 		}
 
 
-		unction GilbertsCurve(layer, x, y, size, rotation) {
+		let counter = 0
+		function GilbertsCurve(layer, x, y, size, rotation) {
 			if (layer == 0) {
-				return [x, y];
+				createLine(lastX, lastY, x, y);
+				lastX = x;
+				lastY = y;
+				counter++
+				console.log(counter, x, y, size)
+
+				return;
 			}
+
 			rotation = rotation % 360;
 
-			const cornerParams = [
+			let cornerParams;
+
+			if (rotation == 0) {
+					cornerParams = [
 				{dx: 0, dy: size / 2, dRotation: 270},
-				{dx: 0, dy: 0, dRotation: 0}
+				{dx: 0, dy: 0, dRotation: 0},
+				{dx: size / 2, dy: 0, dRotation: 0},
+				{dx: size / 2, dy: size / 2, dRotation: 90},]
+			} else if (rotation == 90) {
+				cornerParams = [
+				{dx: size / 2, dy: size / 2, dRotation: 90},
+				{dx: 0, dy: size / 2, dRotation: 270},
+				{dx: 0, dy: 0, dRotation: 0},
+				{dx: size / 2, dy: 0, dRotation: 0},]
+			} else if (rotation == 180) {
+				cornerParams = [
 				{dx: size / 2, dy: 0, dRotation: 0},
 				{dx: size / 2, dy: size / 2, dRotation: 90},
-			];
-
-			let endCoords = [x, y];
-
-			for (let i = 0; i < 4; i++) {
-				const corner = cornerParams[(i + rotation / 90) % 4];
-				endCoords = GilbertsCurve(layer - 1, x + corner.dx, y + corner.dy, size / 2, rotation + corner.dRotation);
-				createLine(endCoords[0], endCoords[1],);
+				{dx: 0, dy: size / 2, dRotation: 270},
+				{dx: 0, dy: 0, dRotation: 0},]
+			} else if (rotation == 270) {
+				cornerParams = [
+				{dx: 0, dy: 0, dRotation: 0},
+				{dx: size / 2, dy: 0, dRotation: 0},
+				{dx: size / 2, dy: size / 2, dRotation: 90},
+				{dx: 0, dy: size / 2, dRotation: 270},]
 			}
 
-			return endCoords;
+			for (let i = 0; i < 4; i++) {
+				const corner = cornerParams[i];
+				GilbertsCurve(layer - 1, x + corner.dx, y + corner.dy, size / 2, rotation + corner.dRotation);
+			}
+
 		}
 
 		GilbertsCurve(layer, 10, 10, 600, 0);
 
 	</script>
+
 
 </body>
 
