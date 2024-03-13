@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>SVG Drawing</title>
+</head>
+
+<body>
+
+	<svg width="1700" height="800" id="svg" style="border: 1px solid black;">
+		<!-- You can draw lines here -->
+	</svg>
+
+	<script>
+
+		const layer = 4;
+
+
+
+
+
+		const svg = document.getElementById("svg");
+
+		function toRadians(degrees) {
+			return degrees * (Math.PI / 180);
+		}
+
+		function createLine(x1, y1, x2, y2) {
+			const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+			line.setAttribute("x1", x1);
+			line.setAttribute("y1", y1);
+			line.setAttribute("x2", x2);
+			line.setAttribute("y2", y2);
+			line.setAttribute("stroke", "black");
+			line.setAttribute("stroke-width", "2");
+
+			svg.appendChild(line);
+		}
+
+		function drawLine(startX, startY, length, angle) {
+			const radians = -toRadians(angle);
+			const endX = startX + length * Math.cos(radians);
+			const endY = startY + length * Math.sin(radians);
+			createLine(startX, startY, endX, endY);
+		}
+
+
+		unction GilbertsCurve(layer, x, y, size, rotation) {
+			if (layer == 0) {
+				return [x, y];
+			}
+			rotation = rotation % 360;
+
+			const cornerParams = [
+				{dx: 0, dy: size / 2, dRotation: 270},
+				{dx: 0, dy: 0, dRotation: 0}
+				{dx: size / 2, dy: 0, dRotation: 0},
+				{dx: size / 2, dy: size / 2, dRotation: 90},
+			];
+
+			let endCoords = [x, y];
+
+			for (let i = 0; i < 4; i++) {
+				const corner = cornerParams[(i + rotation / 90) % 4];
+				endCoords = GilbertsCurve(layer - 1, x + corner.dx, y + corner.dy, size / 2, rotation + corner.dRotation);
+				createLine(endCoords[0], endCoords[1],);
+			}
+
+			return endCoords;
+		}
+
+		GilbertsCurve(layer, 10, 10, 600, 0);
+
+	</script>
+
+</body>
+
+</html>
